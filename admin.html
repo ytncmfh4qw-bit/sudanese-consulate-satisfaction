@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#064b35">
+  <meta name="description" content="لوحة إدارة منصة قياس رضا المواطن السوداني عن خدمات القنصلية بجازان">
+  <title>لوحة إدارة قياس رضا المواطن</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero no-print">
+    <div class="container">
+      <div class="hero-card">
+        <div>
+          <div class="brand">
+            <div class="logo" aria-hidden="true">إ</div>
+            <div>
+              <p class="brand-subtitle">الجالية السودانية بمنطقة جازان</p>
+              <h1 class="brand-title">لوحة إدارة قياس رضا المواطن</h1>
+            </div>
+          </div>
+          <p class="hero-description">عرض المؤشرات والتحليلات والتقييمات التفصيلية لخدمات وصول القنصلية السودانية إلى منطقة جازان.</p>
+        </div>
+        <aside class="hero-badge" aria-label="لوحة تحليلات">
+          <strong>٪</strong>
+          <span>تحليلات فورية للتقييمات</span>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="loginSection" class="login-card no-print" aria-labelledby="loginTitle">
+      <h2 id="loginTitle" class="section-title">دخول الإدارة</h2>
+      <p>تستخدم هذه اللوحة تسجيل دخول حقيقي عبر Supabase Auth. لن تظهر النتائج إلا لحساب مدير موجود في جدول المديرين داخل قاعدة البيانات.</p>
+      <form id="loginForm" class="form-grid">
+        <div class="form-field full">
+          <label for="adminEmail">البريد الإلكتروني للمدير</label>
+          <input id="adminEmail" type="email" autocomplete="username" placeholder="admin@example.com" required>
+        </div>
+        <div class="form-field full">
+          <label for="adminPassword">كلمة مرور حساب Supabase</label>
+          <input id="adminPassword" type="password" autocomplete="current-password" placeholder="أدخل كلمة المرور" required>
+        </div>
+        <div class="actions">
+          <button id="loginButton" class="btn btn-primary" type="submit">دخول اللوحة</button>
+          <a class="btn btn-light" href="index.html">العودة للاستبيان</a>
+        </div>
+      </form>
+      <div id="loginMessage" class="status-message" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="adminSection" class="admin-panel hidden" aria-labelledby="adminTitle">
+      <div class="print-header">
+        <h1>تقرير قياس رضا المواطن السوداني — خدمات القنصلية بجازان</h1>
+        <p id="printDate">تاريخ التقرير</p>
+      </div>
+
+      <h2 id="adminTitle" class="section-title">ملخص النتائج والتحليلات</h2>
+
+      <div class="actions no-print">
+        <button id="refreshButton" class="btn btn-primary" type="button">تحديث البيانات</button>
+        <button id="exportButton" class="btn btn-gold" type="button">تصدير CSV</button>
+        <button id="printButton" class="btn btn-light" type="button">طباعة تقرير PDF</button>
+        <button id="logoutButton" class="btn btn-danger" type="button">تسجيل الخروج</button>
+        <a class="btn btn-light" href="index.html">فتح صفحة المواطن</a>
+      </div>
+
+      <div id="adminMessage" class="status-message" role="status" aria-live="polite"></div>
+
+      <div class="stats-grid" id="statsGrid" aria-live="polite">
+        <div class="stat-card"><span>إجمالي عدد التقييمات</span><strong id="totalCount">٠</strong></div>
+        <div class="stat-card"><span>متوسط الرضا العام من ٥</span><strong id="avgOverall">٠</strong></div>
+        <div class="stat-card"><span>متوسط سرعة الخدمة</span><strong id="avgSpeed">٠</strong></div>
+        <div class="stat-card"><span>متوسط تعامل الموظفين</span><strong id="avgStaff">٠</strong></div>
+        <div class="stat-card"><span>متوسط وضوح الإجراءات</span><strong id="avgClarity">٠</strong></div>
+        <div class="stat-card"><span>متوسط تنظيم الحضور</span><strong id="avgOrganization">٠</strong></div>
+        <div class="stat-card"><span>متوسط جودة التواصل</span><strong id="avgCommunication">٠</strong></div>
+        <div class="stat-card"><span>المعاملات المنجزة</span><strong id="completedCount">٠</strong></div>
+        <div class="stat-card"><span>المعاملات غير المنجزة</span><strong id="notCompletedCount">٠</strong></div>
+        <div class="stat-card"><span>أكثر نوع خدمة تم تقييمه</span><strong id="topService">—</strong></div>
+      </div>
+
+      <div class="charts-grid">
+        <article class="chart-card">
+          <h3>مخطط متوسط التقييمات</h3>
+          <canvas id="ratingsChart"></canvas>
+        </article>
+        <article class="chart-card">
+          <h3>مخطط توزيع أنواع الخدمات</h3>
+          <canvas id="servicesChart"></canvas>
+        </article>
+        <article class="chart-card">
+          <h3>مخطط حالة إنجاز المعاملة</h3>
+          <canvas id="completionChart"></canvas>
+        </article>
+        <article class="chart-card">
+          <h3>مخطط مدة الانتظار</h3>
+          <canvas id="waitingChart"></canvas>
+        </article>
+      </div>
+
+      <h2 class="section-title">سجل التقييمات التفصيلي</h2>
+      <div class="admin-toolbar no-print">
+        <input id="searchInput" type="search" placeholder="بحث برقم الجوال أو نوع الخدمة أو الملاحظة">
+        <select id="serviceFilter">
+          <option value="">كل أنواع الخدمات</option>
+          <option value="إصدار جواز جديد">إصدار جواز جديد</option>
+          <option value="تجديد جواز">تجديد جواز</option>
+          <option value="استلام جواز">استلام جواز</option>
+          <option value="معاملة قنصلية أخرى">معاملة قنصلية أخرى</option>
+        </select>
+        <select id="statusFilter">
+          <option value="">كل حالات الإنجاز</option>
+          <option value="نعم">نعم</option>
+          <option value="جزئياً">جزئياً</option>
+          <option value="لا">لا</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>الرقم المرجعي</th>
+              <th>التاريخ</th>
+              <th>نوع الخدمة</th>
+              <th>الرضا العام</th>
+              <th>السرعة</th>
+              <th>الموظفون</th>
+              <th>الإجراءات</th>
+              <th>التنظيم</th>
+              <th>التواصل</th>
+              <th>الإنجاز</th>
+              <th>الانتظار</th>
+              <th>الجوال</th>
+              <th>الملاحظات</th>
+              <th class="no-print">إجراء</th>
+            </tr>
+          </thead>
+          <tbody id="surveysTableBody">
+            <tr><td colspan="14">جارٍ تحميل البيانات...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="footer-note no-print">منصة قياس رضا المواطن السوداني — خدمات القنصلية بجازان</p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
