@@ -158,3 +158,16 @@ where email = 'old-admin@example.com';
 [3]: https://www.chartjs.org/docs/latest/ "Chart.js Documentation"
 [4]: https://docs.github.com/pages "GitHub Pages Documentation"
 [5]: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps "MDN Progressive Web Apps"
+
+## حساب المدير المجهز حالياً
+
+تم تجهيز ملفات SQL في هذه النسخة لاستخدام البريد التالي كمدير للنظام:
+
+| الحقل | القيمة |
+|---|---|
+| بريد المدير | `engmhi126@gmail.com` |
+| ملف الإضافة السريعة | `add-admin.sql` |
+
+إذا كانت الجداول والسياسات منشأة مسبقاً داخل Supabase، فيكفي تنفيذ ملف `add-admin.sql` من **SQL Editor** لإضافة هذا البريد إلى جدول `survey_admins`. وإذا لم تكن قاعدة البيانات منشأة بعد، نفّذ ملف `database.sql` كاملاً لأنه أصبح يحتوي على البريد نفسه بدلاً من البريد الافتراضي.
+
+> ملاحظة أمنية: تم إنشاء حساب Auth لهذا البريد عبر واجهة التسجيل العامة، لكن Supabase أرسل رسالة تأكيد إلى البريد. يجب فتح رسالة التأكيد قبل أن يتمكن الحساب من تسجيل الدخول إذا كان تأكيد البريد مفعلاً في إعدادات Supabase.

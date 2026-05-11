@@ -111,12 +111,12 @@ to authenticated
 using (public.is_survey_admin());
 
 -- مهم: بعد إنشاء حساب المدير من Authentication > Users، عدّل البريد التالي ثم نفّذ السطر.
--- استبدل admin@example.com ببريد المدير الحقيقي.
+-- تم ضبط بريد المدير الحقيقي أدناه. يمكنك تعديله لاحقاً عند الحاجة.
 insert into public.survey_admins (email, full_name)
-values ('admin@example.com', 'مدير النظام')
+values ('engmhi126@gmail.com', 'مدير النظام')
 on conflict (email) do update set full_name = excluded.full_name;
 
 -- ملاحظات تشغيلية:
 -- 1) صفحة المواطن عامة وتستخدم مفتاح النشر لإضافة التقييمات فقط.
 -- 2) لوحة الإدارة لا تعرض النتائج إلا بعد تسجيل دخول مستخدم موجود في Supabase Auth وبريده موجود في public.survey_admins.
--- 3) غيّر admin@example.com إلى بريدك قبل الاعتماد النهائي.
+-- 3) بريد المدير الحالي المجهز في هذا الملف: engmhi126@gmail.com.
