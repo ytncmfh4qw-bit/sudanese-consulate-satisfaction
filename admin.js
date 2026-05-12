@@ -29,6 +29,7 @@ const searchInput = document.getElementById("searchInput");
 const serviceFilter = document.getElementById("serviceFilter");
 const statusFilter = document.getElementById("statusFilter");
 const surveysTableBody = document.getElementById("surveysTableBody");
+const printReportSummary = document.getElementById("printReportSummary");
 
 let allSurveys = [];
 let filteredSurveys = [];
@@ -89,6 +90,17 @@ function countBy(items, key) {
     accumulator[value] = (accumulator[value] || 0) + 1;
     return accumulator;
   }, {});
+}
+
+function percentage(count, total) {
+  if (!total) return "٠٪";
+  return `${toArabicNumber(((count / total) * 100).toFixed(1))}٪`;
+}
+
+function getTopEntries(items, key, limit = 5) {
+  return Object.entries(countBy(items, key))
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
 }
 
 function getTopService(items) {
@@ -213,6 +225,7 @@ function applyFilters() {
   updateStats(filteredSurveys);
   renderCharts(filteredSurveys);
   renderTable(filteredSurveys);
+  renderPrintSummary(filteredSurveys);
 }
 
 function updateStats(items) {
@@ -305,6 +318,102 @@ function renderPieChart(chartKey, canvasId, dataKey, label, items, font) {
   });
 }
 
+function renderPrintSummary(items) {
+  if (!printReportSummary) return;
+
+  const total = items.length;
+  const completed = items.filter((item) => item.completed_status === "نعم").length;
+  const partial = items.filter((item) => item.completed_status === "جزئياً").length;
+  const notCompleted = items.filter((item) => item.completed_status === "لا").length;
+  const overallAverage = average(items, "overall_rating");
+  const ratingsRows = ratingFields.map((field) => `
+    <tr>
+      <td>${escapeHtml(field.label)}</td>
+      <td>${formatAverage(average(items, field.key))} / ٥</td>
+    </tr>
+  `).join("");
+
+  const distributionRows = (key) => {
+    const entries = getTopEntries(items, key);
+    if (!entries.length) {
+      return `<tr><td colspan="3">لا توجد بيانات كافية.</td></tr>`;
+    }
+    return entries.map(([label, count]) => `
+      <tr>
+        <td>${escapeHtml(label)}</td>
+        <td>${formatNumber(count)}</td>
+        <td>${percentage(count, total)}</td>
+      </tr>
+    `).join("");
+  };
+
+  const visibleNotes = items
+    .filter((item) => String(item.notes || "").trim())
+    .slice(0, 6)
+    .map((item) => `
+      <li>
+        <strong>${escapeHtml(item.reference_no || "تقييم")}</strong>
+        <span>${escapeHtml(item.notes)}</span>
+      </li>
+    `).join("");
+
+  printReportSummary.innerHTML = `
+    <div class="report-intro">
+      <h2>ملخص تنفيذي للطباعة</h2>
+      <p>يعرض هذا التقرير ملخصًا إداريًا للتقييمات الظاهرة حاليًا في لوحة الإدارة حسب البحث والفلاتر المحددة. تم استبعاد الجدول التفصيلي الطويل من نسخة الطباعة لتسهيل القراءة واتخاذ القرار.</p>
+    </div>
+
+    <div class="print-kpi-grid">
+      <div><span>عدد التقييمات</span><strong>${formatNumber(total)}</strong></div>
+      <div><span>متوسط الرضا العام</span><strong>${formatAverage(overallAverage)} / ٥</strong></div>
+      <div><span>نسبة المعاملات المنجزة</span><strong>${percentage(completed, total)}</strong></div>
+      <div><span>أكثر خدمة تقييمًا</span><strong>${escapeHtml(getTopService(items))}</strong></div>
+    </div>
+
+    <div class="print-two-columns">
+      <section>
+        <h3>متوسطات محاور الرضا</h3>
+        <table class="print-table compact-table">
+          <tbody>${ratingsRows}</tbody>
+        </table>
+      </section>
+      <section>
+        <h3>حالة إنجاز المعاملة</h3>
+        <table class="print-table compact-table">
+          <thead><tr><th>الحالة</th><th>العدد</th><th>النسبة</th></tr></thead>
+          <tbody>
+            <tr><td>نعم</td><td>${formatNumber(completed)}</td><td>${percentage(completed, total)}</td></tr>
+            <tr><td>جزئياً</td><td>${formatNumber(partial)}</td><td>${percentage(partial, total)}</td></tr>
+            <tr><td>لا</td><td>${formatNumber(notCompleted)}</td><td>${percentage(notCompleted, total)}</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <div class="print-two-columns">
+      <section>
+        <h3>توزيع أنواع الخدمات</h3>
+        <table class="print-table compact-table">
+          <thead><tr><th>الخدمة</th><th>العدد</th><th>النسبة</th></tr></thead>
+          <tbody>${distributionRows("service_type")}</tbody>
+        </table>
+      </section>
+      <section>
+        <h3>مدة الانتظار</h3>
+        <table class="print-table compact-table">
+          <thead><tr><th>المدة</th><th>العدد</th><th>النسبة</th></tr></thead>
+          <tbody>${distributionRows("waiting_time")}</tbody>
+        </table>
+      </section>
+    </div>
+
+    <section class="print-notes-section">
+      <h3>نماذج مختصرة من الملاحظات</h3>
+      ${visibleNotes ? `<ul class="print-notes">${visibleNotes}</ul>` : `<p class="muted-print-text">لا توجد ملاحظات نصية ضمن النتائج الحالية.</p>`}
+    </section>
+  `;
+}
+
 function renderTable(items) {
   if (!items.length) {
     surveysTableBody.innerHTML = `<tr><td colspan="14">لا توجد تقييمات مطابقة للبحث أو الفلاتر الحالية.</td></tr>`;
@@ -393,6 +502,7 @@ function exportCsv() {
 
 function printReport() {
   document.getElementById("printDate").textContent = `تاريخ التقرير: ${formatDate(new Date().toISOString())}`;
+  renderPrintSummary(filteredSurveys);
   window.print();
 }
 

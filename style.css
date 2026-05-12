@@ -540,8 +540,101 @@ tbody tr:hover {
   font-weight: 700;
 }
 
-.print-header {
+.print-header,
+.print-only {
   display: none;
+}
+
+.report-summary {
+  margin: 22px 0;
+}
+
+.report-intro {
+  padding: 18px;
+  border: 1px solid rgba(6, 75, 53, 0.14);
+  border-radius: 18px;
+  background: #fbfdfc;
+}
+
+.report-intro h2,
+.report-summary h3 {
+  margin: 0 0 10px;
+  color: var(--primary-dark);
+}
+
+.report-intro p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.print-kpi-grid,
+.print-two-columns {
+  display: grid;
+  gap: 14px;
+}
+
+.print-kpi-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 16px 0;
+}
+
+.print-kpi-grid > div,
+.print-two-columns > section,
+.print-notes-section {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.print-kpi-grid span {
+  display: block;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.print-kpi-grid strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--primary-dark);
+  font-size: 1.35rem;
+  line-height: 1.35;
+}
+
+.print-two-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 14px 0;
+}
+
+.print-table {
+  min-width: 0;
+  font-size: 0.95rem;
+}
+
+.compact-table th,
+.compact-table td {
+  padding: 9px 10px;
+}
+
+.print-notes {
+  margin: 0;
+  padding: 0 20px 0 0;
+}
+
+.print-notes li {
+  margin-bottom: 8px;
+}
+
+.print-notes strong {
+  color: var(--primary-dark);
+  margin-left: 8px;
+}
+
+.muted-print-text {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
 }
 
 @media (max-width: 900px) {
@@ -600,8 +693,15 @@ tbody tr:hover {
 }
 
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
   body {
     background: #ffffff;
+    color: #111111;
+    line-height: 1.55;
   }
 
   body::before,
@@ -611,8 +711,13 @@ tbody tr:hover {
   .actions,
   .no-print,
   .btn,
-  .status-message {
+  .status-message,
+  .screen-detailed-records {
     display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
   }
 
   .container {
@@ -628,24 +733,142 @@ tbody tr:hover {
 
   .print-header {
     display: block;
-    margin-bottom: 18px;
-    padding-bottom: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
     border-bottom: 2px solid var(--primary);
     text-align: center;
   }
 
-  .charts-grid,
+  .print-header h1 {
+    margin: 0 0 6px;
+    font-size: 18pt;
+    color: var(--primary-dark);
+  }
+
+  .print-header p {
+    margin: 0;
+    font-size: 10pt;
+    color: #555555;
+  }
+
+  .section-title {
+    margin-bottom: 10px;
+    font-size: 15pt;
+  }
+
+  .section-title::before {
+    height: 24px;
+  }
+
   .stats-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 7px;
+    margin-bottom: 10px;
     break-inside: avoid;
+  }
+
+  .stat-card {
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: none;
+  }
+
+  .stat-card span {
+    font-size: 8pt;
+  }
+
+  .stat-card strong {
+    margin-top: 3px;
+    font-size: 12pt;
+  }
+
+  .charts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 10px 0;
+    break-inside: avoid;
+  }
+
+  .chart-card {
+    min-height: 190px;
+    height: 190px;
+    padding: 8px;
+    border-radius: 8px;
+    break-inside: avoid;
+  }
+
+  .chart-card h3 {
+    margin-bottom: 4px;
+    font-size: 10pt;
+  }
+
+  .chart-card canvas {
+    max-height: 150px !important;
+  }
+
+  .report-summary {
+    margin-top: 10px;
+  }
+
+  .report-intro,
+  .print-kpi-grid > div,
+  .print-two-columns > section,
+  .print-notes-section {
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .report-intro h2,
+  .report-summary h3 {
+    margin-bottom: 5px;
+    font-size: 11pt;
+  }
+
+  .report-intro p,
+  .muted-print-text,
+  .print-notes {
+    font-size: 9pt;
+  }
+
+  .print-kpi-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    margin: 8px 0;
+  }
+
+  .print-kpi-grid span {
+    font-size: 8pt;
+  }
+
+  .print-kpi-grid strong {
+    font-size: 11pt;
+  }
+
+  .print-two-columns {
+    gap: 8px;
+    margin: 8px 0;
   }
 
   table {
     min-width: 0;
-    font-size: 10px;
+    font-size: 9pt;
+    page-break-inside: avoid;
+  }
+
+  th {
+    position: static;
+    background: var(--primary) !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   th,
-  td {
-    padding: 7px;
+  td,
+  .compact-table th,
+  .compact-table td {
+    padding: 5px 6px;
   }
 }
